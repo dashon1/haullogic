@@ -36,7 +36,10 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      {/* Add your page Route elements here */}
+      <Route path="/" element={<Landing />} />
+      <Route path="/Landing" element={<Landing />} />
+      <Route path="/GetQuote" element={<GetQuote />} />
+      <Route path="/AdminDashboard" element={<AdminDashboard />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
