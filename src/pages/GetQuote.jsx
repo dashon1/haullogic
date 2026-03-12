@@ -5,71 +5,10 @@ import PhotoUploadStep from '@/components/quote/PhotoUploadStep';
 import QuestionsStep from '@/components/quote/QuestionsStep';
 import ContactStep from '@/components/quote/ContactStep';
 import QuoteResult from '@/components/quote/QuoteResult';
+import { calculateQuote } from '@/components/quote/pricingEngine';
 import { Truck } from 'lucide-react';
 
-const PRICING = {
-  base: {
-    minimum: 125, eighth: 150, quarter: 225,
-    half: 375, three_quarter: 575, full: 750
-  },
-  surcharges: {
-    mattress: { label: 'Mattress', amount: 25 },
-    refrigerator: { label: 'Refrigerator', amount: 50 },
-    tires: { label: 'Tires (each)', amount: 15 },
-    paint: { label: 'Paint / Hazmat', amount: 35 },
-    hot_tub: { label: 'Hot Tub', amount: 150 },
-    piano: { label: 'Piano', amount: 200 },
-    tv: { label: 'TV / Electronics', amount: 20 },
-  }
-};
-
-function getBucket(fill) {
-  if (fill <= 10) return 'minimum';
-  if (fill <= 20) return 'eighth';
-  if (fill <= 40) return 'quarter';
-  if (fill <= 60) return 'half';
-  if (fill <= 85) return 'three_quarter';
-  return 'full';
-}
-
-function calculateQuote(assessment, formData) {
-  const bucket = assessment?.estimated_load_bucket || getBucket(assessment?.estimated_trailer_fill_percent || 25);
-  const base = PRICING.base[bucket] || 225;
-  const surcharges = [];
-
-  const items = formData.special_items || [];
-  items.forEach(item => {
-    if (item !== 'none' && PRICING.surcharges[item]) {
-      surcharges.push(PRICING.surcharges[item]);
-    }
-  });
-
-  const heavyMats = formData.heavy_materials || [];
-  if (heavyMats.some(m => m !== 'none')) {
-    surcharges.push({ label: 'Heavy Materials', amount: 50 });
-  }
-  if (formData.junk_location === 'upstairs') {
-    surcharges.push({ label: 'Upstairs / Stairs', amount: 25 });
-  }
-  if (formData.service_timing === 'today') {
-    surcharges.push({ label: 'Same-Day Service', amount: 40 });
-  }
-
-  const total = base + surcharges.reduce((s, c) => s + c.amount, 0);
-  const margin = Math.round(total * 0.2 / 5) * 5;
-
-  const score = assessment?.confidence_score || 0;
-  const confidence = score >= 0.75 ? 'high' : score >= 0.55 ? 'medium' : 'low';
-
-  return {
-    base_price: base,
-    surcharges,
-    estimate_min: total,
-    estimate_max: total + margin,
-    load_size_label: bucket,
-    confidence_level: confidence
-  };
-}
+const BUSINESS_ID = 'ALLIN_TB'; // Default business — can be made dynamic later
 
 export default function GetQuote() {
   const [step, setStep] = useState(1);
