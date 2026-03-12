@@ -41,6 +41,7 @@ const AuthenticatedApp = () => {
       <Route path="/Landing" element={<Landing />} />
       <Route path="/GetQuote" element={<GetQuote />} />
       <Route path="/AdminDashboard" element={<AdminDashboard />} />
+      <Route path="/DriverView" element={<DriverView />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
