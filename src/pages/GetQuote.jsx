@@ -109,7 +109,7 @@ export default function GetQuote() {
         special_items: formData.special_items || [],
         estimated_size: formData.estimated_size,
         service_timing: formData.service_timing,
-        photo_urls: photos,
+        photo_urls: photoUrls,
         status: 'new',
       });
 
