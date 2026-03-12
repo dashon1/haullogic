@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import LeadRow from '@/components/admin/LeadRow';
 import LeadDetail from '@/components/admin/LeadDetail';
-import { Truck, Users, DollarSign, TrendingUp, RefreshCw } from 'lucide-react';
+import PricingUpload from '@/components/admin/PricingUpload';
+import { Truck, Users, DollarSign, TrendingUp, RefreshCw, FileSpreadsheet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const filterTabs = ['All', 'New', 'Reviewed', 'Approved', 'Booked', 'Completed'];
