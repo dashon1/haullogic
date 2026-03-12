@@ -15,6 +15,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [selectedLead, setSelectedLead] = useState(null);
+  const [activeTab, setActiveTab] = useState('leads');
 
   const loadData = async () => {
     setLoading(true);
