@@ -82,9 +82,11 @@ export default function GetQuote() {
     setLoading(true);
     try {
       let assessment = null;
-      if (photos.length > 0) {
+      const photoUrls = Object.values(photos).filter(Boolean);
+      if (photoUrls.length > 0) {
         const res = await base44.functions.invoke('analyzePhotos', {
-          photo_urls: photos,
+          photo_urls: photoUrls,
+          photo_map: photos,
           service_type: formData.service_type,
           junk_location: formData.junk_location,
           heavy_materials: formData.heavy_materials,
