@@ -10,7 +10,7 @@ const features = [
 ];
 
 const reviews = [
-  { name: 'Mike R.', text: 'Uploaded 4 photos, got a quote immediately. Crew was here next day. Couldn't be easier.', stars: 5 },
+  { name: 'Mike R.', text: "Uploaded 4 photos, got a quote immediately. Crew was here next day. Couldn't be easier.", stars: 5 },
   { name: 'Sarah L.', text: 'Cleaned out my entire garage. Fair price, fast service, super professional.', stars: 5 },
   { name: 'David K.', text: 'Used the trailer drop-off. Easy process start to finish.', stars: 5 },
 ];
