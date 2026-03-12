@@ -35,7 +35,9 @@ export default function GetQuote() {
         assessment = res.data?.assessment;
       }
 
-      const quote = calculateQuote(assessment, formData);
+      // Load dynamic pricing rules for this business
+      const pricingRules = await base44.entities.PricingRule.filter({ BusinessId: BUSINESS_ID });
+      const quote = calculateQuote(assessment, formData, pricingRules);
 
       const lead = await base44.entities.Lead.create({
         name: formData.name,
