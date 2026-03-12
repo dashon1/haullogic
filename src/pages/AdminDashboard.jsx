@@ -62,10 +62,16 @@ export default function AdminDashboard() {
               <p className="font-bold text-slate-900 text-lg leading-none">Admin Dashboard</p>
             </div>
           </div>
-          <Button onClick={loadData} variant="outline" size="sm" className="gap-1.5 rounded-xl">
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={() => setActiveTab(activeTab === 'pricing' ? 'leads' : 'pricing')} variant="outline" size="sm" className={`gap-1.5 rounded-xl ${activeTab === 'pricing' ? 'bg-orange-50 border-orange-300 text-orange-700' : ''}`}>
+              <FileSpreadsheet className="w-3.5 h-3.5" />
+              Pricing
+            </Button>
+            <Button onClick={loadData} variant="outline" size="sm" className="gap-1.5 rounded-xl">
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+          </div>
         </div>
 
         {/* Stats */}
