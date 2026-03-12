@@ -9,6 +9,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Landing from './pages/Landing';
 import GetQuote from './pages/GetQuote';
 import AdminDashboard from './pages/AdminDashboard';
+import DriverView from './pages/DriverView';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
