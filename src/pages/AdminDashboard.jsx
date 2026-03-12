@@ -99,6 +99,13 @@ export default function AdminDashboard() {
           </div>
         </div>
 
+        {/* Pricing Upload Panel */}
+        {activeTab === 'pricing' && (
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-6">
+            <PricingUpload onUploaded={() => setActiveTab('leads')} />
+          </div>
+        )}
+
         {/* Filter Tabs */}
         <div className="flex gap-1.5 overflow-x-auto pb-1 mb-4 scrollbar-hide">
           {filterTabs.map(tab => (
