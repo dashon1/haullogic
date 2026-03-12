@@ -73,7 +73,7 @@ function calculateQuote(assessment, formData) {
 
 export default function GetQuote() {
   const [step, setStep] = useState(1);
-  const [photos, setPhotos] = useState([]);
+  const [photos, setPhotos] = useState({});
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);

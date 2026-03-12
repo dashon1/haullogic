@@ -3,9 +3,27 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const { photo_urls, service_type, junk_location, heavy_materials, special_items, estimated_size } = await req.json();
+    const { photo_urls, photo_map, service_type, junk_location, heavy_materials, special_items, estimated_size } = await req.json();
+
+    // Build structured photo context if slot labels are provided
+    const photoContext = photo_map
+      ? Object.entries(photo_map).map(([slot, url]) => `- ${slot}: ${url}`).join('\n')
+      : 'Photos provided without specific angle labels.';
 
     const prompt = `You are an expert junk removal estimator. Analyze these photos of junk/debris and provide a structured assessment for quoting purposes.
+
+PHOTO ANGLES PROVIDED:
+${photoContext}
+
+Each photo was taken from a specific angle:
+- "wide": full wide shot of all junk
+- "left": left-angle view
+- "right": right-angle view
+- "closeup": close-up of largest/heaviest items
+- "access": access path to the junk
+- "stairs": stairs or obstacles (if present)
+
+Use all available angles together to build the most accurate 3D understanding of volume, material, and access.
 
 Customer provided context:
 - Service type: ${service_type}
