@@ -62,6 +62,13 @@ export function mapServiceType(service_type) {
 }
 
 export function resolveTierCode(assessment, formData) {
+  const serviceType = mapServiceType(formData.service_type);
+
+  // DropOff uses time-based tiers only — never map volume/fill to DropOff tiers
+  if (serviceType === 'DropOff') {
+    return formData.drop_off_duration || 'FULL_DAY';
+  }
+
   if (assessment?.estimated_load_bucket) {
     return BUCKET_TO_TIER[assessment.estimated_load_bucket] || 'HALF';
   }
@@ -69,13 +76,13 @@ export function resolveTierCode(assessment, formData) {
     return getTierFromFill(assessment.estimated_trailer_fill_percent);
   }
   const sizeMap = {
-    one_item:           'MIN',
-    small_pile:         'QTR',
-    quarter_trailer:    'QTR',
-    half_trailer:       'HALF',
+    one_item:              'MIN',
+    small_pile:            'QTR',
+    quarter_trailer:       'QTR',
+    half_trailer:          'HALF',
     three_quarter_trailer: '3QTR',
-    full_trailer:       'FULL',
-    not_sure:           'HALF',
+    full_trailer:          'FULL',
+    not_sure:              'HALF',
   };
   return sizeMap[formData.estimated_size] || 'HALF';
 }
