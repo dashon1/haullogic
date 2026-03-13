@@ -198,8 +198,12 @@ function calculateFromRules(rules, serviceType, tierCode, triggers, formData, co
   };
 }
 
+const FALLBACK_MINIMUMS = { FullService: 125, Curbside: 125, DropOff: 175 };
+
 function calculateFallback(serviceType, tierCode, triggers, formData, confidence) {
-  const tierData = FALLBACK_PRICING[serviceType]?.[tierCode] || FALLBACK_PRICING['FullService']['HALF'];
+  // DropOff fallback: use FULL_DAY as default since volume tiers don't apply
+  const effectiveTier = serviceType === 'DropOff' ? (tierCode || 'FULL_DAY') : tierCode;
+  const tierData = FALLBACK_PRICING[serviceType]?.[effectiveTier] || FALLBACK_PRICING['FullService']['HALF'];
   const base = tierData.min;
   const surcharges = [];
 
@@ -214,7 +218,9 @@ function calculateFallback(serviceType, tierCode, triggers, formData, confidence
   if (triggers.same_day)       surcharges.push({ label: 'Same-Day Service', amount: 40 });
   if (triggers.curbside_ready) surcharges.push({ label: 'Curbside Discount', amount: -25 });
 
-  const total = Math.max(0, base + surcharges.reduce((s, c) => s + c.amount, 0));
+  const floor = FALLBACK_MINIMUMS[serviceType] || 125;
+  const raw = Math.max(0, base + surcharges.reduce((s, c) => s + c.amount, 0));
+  const total = Math.max(raw, floor);
   const margin = Math.round(total * 0.2 / 5) * 5;
 
   return {
@@ -222,9 +228,10 @@ function calculateFallback(serviceType, tierCode, triggers, formData, confidence
     surcharges,
     estimate_min: total,
     estimate_max: total + margin,
-    load_size_label: tierCode,
+    load_size_label: tierData.label || effectiveTier,
     service_type_label: serviceType,
     confidence_level: confidence,
     pricing_source: 'fallback',
+    minimum_applied: raw < floor ? floor : null,
   };
 }
