@@ -122,6 +122,10 @@ function calculateFromRules(rules, serviceType, tierCode, triggers, formData, co
     (r.TierCode === tierCode || r.TierCode === 'ANY')
   );
 
+  if (!baseRow) {
+    console.warn(`MISSING_BASE_RULE(${serviceType}, ${tierCode})`);
+  }
+
   const baseMin = baseRow?.AmountMin || 0;
   const baseMax = baseRow?.AmountMax || baseMin;
   const tierLabel = baseRow?.TierLabel || tierCode;
@@ -159,8 +163,25 @@ function calculateFromRules(rules, serviceType, tierCode, triggers, formData, co
       }
     });
 
-  const totalMin = Math.max(0, baseMin + surcharges.reduce((s, c) => s + c.amount, 0));
-  const totalMax = Math.max(0, baseMax + surcharges.reduce((s, c) => s + c.amount, 0));
+  const surchargeTotal = surcharges.reduce((s, c) => s + c.amount, 0);
+  let totalMin = Math.max(0, baseMin + surchargeTotal);
+  let totalMax = Math.max(0, baseMax + surchargeTotal);
+
+  // MINIMUM FLOOR: enforce RULE rows with Trigger=min_total
+  const minFloorRow = rules.find(r =>
+    r.LineType === 'RULE' &&
+    r.ItemOrCondition === 'Minimum Charge' &&
+    r.ServiceType === serviceType &&
+    r.TierCode === 'ANY' &&
+    r.Trigger === 'min_total'
+  );
+
+  if (minFloorRow) {
+    const floor = minFloorRow.AmountMin;
+    if (totalMin < floor) totalMin = floor;
+    if (totalMax < floor) totalMax = floor;
+  }
+
   const marginMax = Math.round(totalMax * 0.1 / 5) * 5;
 
   return {
@@ -168,11 +189,12 @@ function calculateFromRules(rules, serviceType, tierCode, triggers, formData, co
     surcharges,
     estimate_min: totalMin,
     estimate_max: totalMax + marginMax,
-    load_size_label: tierCode,
+    load_size_label: tierLabel || tierCode,
     service_type_label: serviceType,
     confidence_level: confidence,
     disposal_credit: disposalCredit,
     pricing_source: 'custom',
+    minimum_applied: minFloorRow ? minFloorRow.AmountMin : null,
   };
 }
 
