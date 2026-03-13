@@ -78,6 +78,39 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'No valid rows found in CSV' }, { status: 400 });
     }
 
+    // Ensure minimum floor RULE rows are always present
+    const SERVICE_MINIMUMS = [
+      { ServiceType: 'FullService', AmountMin: 125 },
+      { ServiceType: 'Curbside',    AmountMin: 125 },
+      { ServiceType: 'DropOff',     AmountMin: 175 },
+    ];
+    for (const svc of SERVICE_MINIMUMS) {
+      const alreadyPresent = rows.some(r =>
+        r.LineType === 'RULE' &&
+        r.ServiceType === svc.ServiceType &&
+        r.TierCode === 'ANY' &&
+        r.Trigger === 'min_total'
+      );
+      if (!alreadyPresent) {
+        rows.push({
+          BusinessId: business_id,
+          Region: '',
+          ServiceType: svc.ServiceType,
+          TierCode: 'ANY',
+          TierLabel: 'Any Tier',
+          TierOrder: 99,
+          LineType: 'RULE',
+          ItemOrCondition: 'Minimum Charge',
+          AmountMin: svc.AmountMin,
+          AmountMax: svc.AmountMin,
+          Unit: 'flat',
+          Trigger: 'min_total',
+          DisposalCredit: null,
+          Notes: 'Auto-injected minimum floor',
+        });
+      }
+    }
+
     // Delete existing rules for this business before inserting new ones
     const existing = await base44.asServiceRole.entities.PricingRule.filter({ BusinessId: business_id });
     for (const rule of existing) {
