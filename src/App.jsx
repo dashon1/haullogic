@@ -10,6 +10,8 @@ import Landing from './pages/Landing';
 import GetQuote from './pages/GetQuote';
 import AdminDashboard from './pages/AdminDashboard';
 import DriverView from './pages/DriverView';
+import Onboarding from './pages/Onboarding';
+import PublicQuote from './pages/PublicQuote';
 
 class ErrorBoundary extends Component {
   state = { hasError: false };
@@ -55,6 +57,8 @@ const AuthenticatedApp = () => {
       <Route path="/GetQuote" element={<GetQuote />} />
       <Route path="/AdminDashboard" element={<AdminDashboard />} />
       <Route path="/DriverView" element={<DriverView />} />
+      <Route path="/Onboarding" element={<Onboarding />} />
+      <Route path="/quote/:businessId" element={<PublicQuote />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

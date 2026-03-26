@@ -3,8 +3,9 @@ import { base44 } from '@/api/base44Client';
 import LeadRow from '@/components/admin/LeadRow';
 import LeadDetail from '@/components/admin/LeadDetail';
 import PricingUpload from '@/components/admin/PricingUpload';
-import { Truck, Users, DollarSign, TrendingUp, RefreshCw, FileSpreadsheet } from 'lucide-react';
+import { Truck, Users, DollarSign, TrendingUp, RefreshCw, FileSpreadsheet, Copy, CheckCircle, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 const filterTabs = ['All', 'New', 'Reviewed', 'Approved', 'Booked', 'Completed'];
 
@@ -16,6 +17,17 @@ export default function AdminDashboard() {
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [selectedLead, setSelectedLead] = useState(null);
   const [activeTab, setActiveTab] = useState('leads');
+  const [copied, setCopied] = useState(false);
+
+  const businessId = localStorage.getItem('haullogic_business_id') || '';
+  const quoteUrl = businessId ? `${window.location.origin}/quote/${businessId}` : null;
+
+  const copyLink = () => {
+    if (!quoteUrl) return;
+    navigator.clipboard.writeText(quoteUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -58,7 +70,7 @@ export default function AdminDashboard() {
               <Truck className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="text-xs text-slate-400 font-medium">Dump Haul</p>
+              <p className="text-xs text-slate-400 font-medium">HaulLogic</p>
               <p className="font-bold text-slate-900 text-lg leading-none">Admin Dashboard</p>
             </div>
           </div>
@@ -67,12 +79,33 @@ export default function AdminDashboard() {
               <FileSpreadsheet className="w-3.5 h-3.5" />
               Pricing
             </Button>
+            {!businessId && (
+              <Link to="/Onboarding">
+                <Button size="sm" className="gap-1.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white">
+                  <Settings className="w-3.5 h-3.5" />
+                  Setup
+                </Button>
+              </Link>
+            )}
             <Button onClick={loadData} variant="outline" size="sm" className="gap-1.5 rounded-xl">
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
           </div>
         </div>
+
+        {/* Quote link banner */}
+        {quoteUrl && (
+          <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4 mb-6 flex items-center gap-3">
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold text-orange-700 mb-0.5">Your customer quote link</p>
+              <p className="text-xs font-mono text-orange-600 truncate">{quoteUrl}</p>
+            </div>
+            <Button onClick={copyLink} variant="outline" size="sm" className="flex-shrink-0 gap-1.5 border-orange-300 text-orange-700 hover:bg-orange-100">
+              {copied ? <><CheckCircle className="w-3 h-3 text-green-500" /> Copied!</> : <><Copy className="w-3 h-3" /> Copy</>}
+            </Button>
+          </div>
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3 mb-6">
