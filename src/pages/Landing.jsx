@@ -67,7 +67,7 @@ export default function Landing() {
       {/* Features */}
       <div className="bg-slate-50 py-12">
         <div className="max-w-lg mx-auto px-6 space-y-4">
-          <p className="text-center text-slate-400 text-xs font-semibold uppercase tracking-widest mb-6">Why Dump Haul</p>
+          <p className="text-center text-slate-400 text-xs font-semibold uppercase tracking-widest mb-6">Why HaulLogic</p>
           {features.map((f, i) => (
             <div key={i} className="bg-white rounded-2xl p-5 flex items-start gap-4 shadow-sm">
               <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -115,7 +115,7 @@ export default function Landing() {
       </div>
 
       <div className="py-6 text-center text-slate-400 text-xs">
-        © 2026 Dump Haul · Licensed & Insured
+        © 2026 HaulLogic · Licensed & Insured
       </div>
     </div>
   );

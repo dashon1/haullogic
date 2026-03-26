@@ -6,19 +6,59 @@ import QuestionsStep from '@/components/quote/QuestionsStep';
 import ContactStep from '@/components/quote/ContactStep';
 import QuoteResult from '@/components/quote/QuoteResult';
 import { calculateQuote } from '@/components/quote/pricingEngine';
-import { Truck } from 'lucide-react';
+import { Truck, Loader2, Camera, Brain, ClipboardCheck } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-const BUSINESS_ID = 'ALLIN_TB'; // Default business — can be made dynamic later
+const BUSINESS_ID = 'ALLIN_TB';
+
+const LOADING_STEPS = [
+  { icon: Camera, label: 'Uploading your photos...' },
+  { icon: Brain, label: 'AI is analyzing your junk...' },
+  { icon: ClipboardCheck, label: 'Calculating your estimate...' },
+];
+
+function ProcessingScreen() {
+  const [stepIndex, setStepIndex] = React.useState(0);
+
+  React.useEffect(() => {
+    const timers = [
+      setTimeout(() => setStepIndex(1), 2000),
+      setTimeout(() => setStepIndex(2), 5000),
+    ];
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  const current = LOADING_STEPS[stepIndex];
+
+  return (
+    <div className="text-center py-8 space-y-6">
+      <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto">
+        <current.icon className="w-10 h-10 text-orange-500" />
+      </div>
+      <div>
+        <Loader2 className="w-6 h-6 animate-spin text-orange-400 mx-auto mb-3" />
+        <p className="font-semibold text-slate-800">{current.label}</p>
+        <p className="text-slate-400 text-sm mt-1">This takes about 10–20 seconds</p>
+      </div>
+      <div className="flex justify-center gap-2">
+        {LOADING_STEPS.map((_, i) => (
+          <div key={i} className={`h-1.5 rounded-full transition-all duration-500 ${i <= stepIndex ? 'w-8 bg-orange-500' : 'w-4 bg-slate-200'}`} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function GetQuote() {
   const [step, setStep] = useState(1);
   const [photos, setPhotos] = useState({});
   const [formData, setFormData] = useState({});
-  const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
 
   const handleSubmit = async () => {
-    setLoading(true);
+    setStep(4); // Show processing screen
+    setError(null);
     try {
       let assessment = null;
       const photoUrls = Object.values(photos).filter(Boolean);
@@ -35,7 +75,6 @@ export default function GetQuote() {
         assessment = res.data?.assessment;
       }
 
-      // Load dynamic pricing rules for this business
       const pricingRules = await base44.entities.PricingRule.filter({ BusinessId: BUSINESS_ID });
       const quote = calculateQuote(assessment, formData, pricingRules);
 
@@ -84,57 +123,82 @@ export default function GetQuote() {
       setStep(5);
     } catch (err) {
       console.error(err);
+      setError("Something went wrong generating your quote. Please try again.");
+      setStep(3);
     }
-    setLoading(false);
+  };
+
+  const handleBookService = () => {
+    setStep(6); // Booking confirmed screen
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       <div className="max-w-lg mx-auto px-4 py-8">
         <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center">
-            <Truck className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">Dump Haul</p>
-            <p className="text-sm font-bold text-slate-900 leading-none">Instant Quote</p>
-          </div>
+          <Link to="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center">
+              <Truck className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">HaulLogic</p>
+              <p className="text-sm font-bold text-slate-900 leading-none">Instant Quote</p>
+            </div>
+          </Link>
         </div>
 
-        {step < 5 && <StepIndicator currentStep={step} />}
+        {step < 4 && <StepIndicator currentStep={step} />}
+
+        {error && (
+          <div className="mb-4 bg-red-50 border border-red-200 rounded-2xl p-4 text-red-700 text-sm">
+            {error}
+          </div>
+        )}
 
         <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
           {step === 1 && (
-            <PhotoUploadStep
-              photos={photos}
-              setPhotos={setPhotos}
-              onNext={() => setStep(2)}
-            />
+            <PhotoUploadStep photos={photos} setPhotos={setPhotos} onNext={() => setStep(2)} />
           )}
           {step === 2 && (
-            <QuestionsStep
-              formData={formData}
-              setFormData={setFormData}
-              onNext={() => setStep(3)}
-              onBack={() => setStep(1)}
-            />
+            <QuestionsStep formData={formData} setFormData={setFormData} onNext={() => setStep(3)} onBack={() => setStep(1)} />
           )}
           {step === 3 && (
-            <ContactStep
-              formData={formData}
-              setFormData={setFormData}
-              onSubmit={handleSubmit}
-              onBack={() => setStep(2)}
-              loading={loading}
-            />
+            <ContactStep formData={formData} setFormData={setFormData} onSubmit={handleSubmit} onBack={() => setStep(2)} loading={false} />
           )}
+          {step === 4 && <ProcessingScreen />}
           {step === 5 && result && (
             <QuoteResult
               quote={result.quote}
               assessment={result.assessment}
               lead={result.lead}
-              onBookService={() => alert('Booking confirmed! We\'ll call you shortly to schedule.')}
+              onBookService={handleBookService}
             />
+          )}
+          {step === 6 && result && (
+            <div className="text-center py-6 space-y-5">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                <span className="text-4xl">✅</span>
+              </div>
+              <div>
+                <h2 className="text-2xl font-black text-slate-900">You're all set, {result.lead?.name?.split(' ')[0]}!</h2>
+                <p className="text-slate-500 text-sm mt-2">We've received your request and a team member will call you to confirm your appointment.</p>
+              </div>
+              <div className="bg-orange-50 border border-orange-200 rounded-2xl p-5 text-left space-y-3">
+                <p className="font-semibold text-orange-800 text-sm">What happens next:</p>
+                <div className="space-y-2 text-sm text-orange-700">
+                  <p>📞 We'll call <strong>{result.lead?.phone}</strong> within 1 hour</p>
+                  <p>📅 You'll confirm your preferred time slot</p>
+                  <p>💳 Price locked in before work begins</p>
+                </div>
+              </div>
+              <div className="pt-2">
+                <p className="text-slate-500 text-xs mb-3">Want to reach us directly?</p>
+                <a href="tel:+17272714341" className="inline-flex items-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-2xl font-semibold hover:bg-orange-600 transition-colors">
+                  📞 Call Us Now
+                </a>
+              </div>
+              <Link to="/" className="block text-slate-400 text-sm hover:text-slate-600 mt-2">← Back to Home</Link>
+            </div>
           )}
         </div>
       </div>

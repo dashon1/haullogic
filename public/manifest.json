@@ -1,0 +1,26 @@
+{
+  "name": "HaulLogic — Instant Junk Removal Quotes",
+  "short_name": "HaulLogic",
+  "description": "Get an instant junk removal estimate by uploading a few photos. No phone calls required.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#f97316",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["utilities", "business"],
+  "shortcuts": [
+    {
+      "name": "Get a Quote",
+      "url": "/GetQuote",
+      "description": "Upload photos and get an instant estimate"
+    }
+  ]
+}
