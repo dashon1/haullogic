@@ -1,0 +1,119 @@
+{
+  "name": "Lead",
+  "type": "object",
+  "properties": {
+    "business_id": {
+      "type": "string",
+      "description": "Tenant identifier \u2014 which business this lead belongs to"
+    },
+    "name": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "service_type": {
+      "type": "string",
+      "enum": [
+        "trailer_drop_off",
+        "curbside_pickup",
+        "full_service"
+      ]
+    },
+    "junk_location": {
+      "type": "string",
+      "enum": [
+        "curb",
+        "driveway",
+        "garage",
+        "inside_home",
+        "backyard",
+        "upstairs"
+      ]
+    },
+    "heavy_materials": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "none",
+          "dirt",
+          "concrete",
+          "roofing_shingles",
+          "bricks",
+          "tile"
+        ]
+      }
+    },
+    "special_items": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "mattress",
+          "refrigerator",
+          "tv",
+          "tires",
+          "paint",
+          "hot_tub",
+          "piano",
+          "none"
+        ]
+      }
+    },
+    "estimated_size": {
+      "type": "string",
+      "enum": [
+        "one_item",
+        "small_pile",
+        "quarter_trailer",
+        "half_trailer",
+        "three_quarter_trailer",
+        "full_trailer",
+        "not_sure"
+      ]
+    },
+    "service_timing": {
+      "type": "string",
+      "enum": [
+        "today",
+        "tomorrow",
+        "this_week",
+        "flexible"
+      ]
+    },
+    "notes": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "reviewed",
+        "approved",
+        "booked",
+        "completed",
+        "cancelled"
+      ],
+      "default": "new"
+    },
+    "photo_urls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "name",
+    "phone",
+    "email",
+    "address"
+  ]
+}
