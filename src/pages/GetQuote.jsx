@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
+import { BUSINESS } from '@/lib/businessConfig';
 import StepIndicator from '@/components/quote/StepIndicator';
 import PhotoUploadStep from '@/components/quote/PhotoUploadStep';
 import QuestionsStep from '@/components/quote/QuestionsStep';
@@ -186,17 +187,19 @@ export default function GetQuote() {
               <div className="bg-orange-50 border border-orange-200 rounded-2xl p-5 text-left space-y-3">
                 <p className="font-semibold text-orange-800 text-sm">What happens next:</p>
                 <div className="space-y-2 text-sm text-orange-700">
-                  <p>📞 We'll call <strong>{result.lead?.phone}</strong> within 1 hour</p>
+                  <p>📞 We'll call <strong>{result.lead?.phone}</strong> within {BUSINESS.responseTime}</p>
                   <p>📅 You'll confirm your preferred time slot</p>
                   <p>💳 Price locked in before work begins</p>
                 </div>
               </div>
-              <div className="pt-2">
-                <p className="text-slate-500 text-xs mb-3">Want to reach us directly?</p>
-                <a href="tel:+17272714341" className="inline-flex items-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-2xl font-semibold hover:bg-orange-600 transition-colors">
-                  📞 Call Us Now
-                </a>
-              </div>
+              {BUSINESS.phone && (
+                <div className="pt-2">
+                  <p className="text-slate-500 text-xs mb-3">Want to reach us directly?</p>
+                  <a href={`tel:${BUSINESS.phone}`} className="inline-flex items-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-2xl font-semibold hover:bg-orange-600 transition-colors">
+                    📞 {BUSINESS.phoneDisplay || 'Call Us Now'}
+                  </a>
+                </div>
+              )}
               <Link to="/" className="block text-slate-400 text-sm hover:text-slate-600 mt-2">← Back to Home</Link>
             </div>
           )}
