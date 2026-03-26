@@ -19,7 +19,8 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('leads');
   const [copied, setCopied] = useState(false);
 
-  const businessId = localStorage.getItem('haullogic_business_id') || '';
+  const [business, setBusiness] = useState(null);
+  const businessId = business?.business_id || '';
   const quoteUrl = businessId ? `${window.location.origin}/quote/${businessId}` : null;
 
   const copyLink = () => {
@@ -29,12 +30,14 @@ export default function AdminDashboard() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const loadData = async () => {
+  const loadData = async (biz) => {
+    const activeBiz = biz || business;
+    if (!activeBiz?.business_id) return;
     setLoading(true);
     const [l, q, a] = await Promise.all([
-      base44.entities.Lead.list('-created_date', 100),
-      base44.entities.Quote.list('-created_date', 100),
-      base44.entities.AIAssessment.list('-created_date', 100),
+      base44.entities.Lead.filter({ business_id: activeBiz.business_id }, '-created_date', 100),
+      base44.entities.Quote.filter({ business_id: activeBiz.business_id }, '-created_date', 100),
+      base44.entities.AIAssessment.filter({ business_id: activeBiz.business_id }, '-created_date', 100),
     ]);
     setLeads(l);
     setQuotes(q);
@@ -42,7 +45,18 @@ export default function AdminDashboard() {
     setLoading(false);
   };
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => {
+    base44.auth.me().then(user => {
+      base44.entities.Business.filter({ owner_email: user.email }).then(results => {
+        if (results.length > 0) {
+          setBusiness(results[0]);
+          loadData(results[0]);
+        } else {
+          setLoading(false);
+        }
+      });
+    });
+  }, []);
 
   const getQuote = (leadId) => quotes.find(q => q.lead_id === leadId);
   const getAssessment = (leadId) => assessments.find(a => a.lead_id === leadId);
@@ -87,7 +101,7 @@ export default function AdminDashboard() {
                 </Button>
               </Link>
             )}
-            <Button onClick={loadData} variant="outline" size="sm" className="gap-1.5 rounded-xl">
+            <Button onClick={() => loadData()} variant="outline" size="sm" className="gap-1.5 rounded-xl">
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
               Refresh
             </Button>

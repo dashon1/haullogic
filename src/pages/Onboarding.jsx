@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -54,6 +54,31 @@ export default function Onboarding() {
     setSaving(true);
     setError(null);
     try {
+      const user = await base44.auth.me();
+
+      // Upsert Business record
+      const existingBiz = await base44.entities.Business.filter({ owner_email: user.email });
+      if (existingBiz.length > 0) {
+        await base44.entities.Business.update(existingBiz[0].id, {
+          business_id: businessId,
+          name: info.name,
+          phone: info.phone,
+          email: info.email,
+          region: info.region,
+        });
+      } else {
+        await base44.entities.Business.create({
+          owner_email: user.email,
+          business_id: businessId,
+          name: info.name,
+          phone: info.phone,
+          email: info.email,
+          region: info.region,
+          plan: 'starter',
+          subscription_status: 'none',
+        });
+      }
+
       // Delete any existing rules for this businessId first
       const existing = await base44.entities.PricingRule.filter({ BusinessId: businessId });
       await Promise.all(existing.map(r => base44.entities.PricingRule.delete(r.id)));
@@ -76,27 +101,7 @@ export default function Onboarding() {
         Notes: `Set up via onboarding — ${info.name}`,
       }));
 
-      // Add a BUSINESS_INFO marker rule so we can look up business details later
-      rules.push({
-        BusinessId: businessId,
-        Region: info.region || 'Local',
-        ServiceType: 'INFO',
-        TierCode: 'INFO',
-        TierLabel: info.name,
-        TierOrder: 0,
-        LineType: 'BUSINESS_INFO',
-        ItemOrCondition: JSON.stringify({ name: info.name, phone: info.phone, email: info.email }),
-        AmountMin: 0,
-        AmountMax: 0,
-        Unit: 'info',
-        Trigger: '',
-        Notes: 'Business info record',
-      });
-
       await Promise.all(rules.map(r => base44.entities.PricingRule.create(r)));
-
-      // Save businessId to localStorage so admin dashboard auto-loads it
-      localStorage.setItem('haullogic_business_id', businessId);
 
       setStep(4);
     } catch (err) {

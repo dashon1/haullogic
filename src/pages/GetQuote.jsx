@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { BUSINESS } from '@/lib/businessConfig';
 import StepIndicator from '@/components/quote/StepIndicator';
@@ -80,6 +80,7 @@ export default function GetQuote() {
       const quote = calculateQuote(assessment, formData, pricingRules);
 
       const lead = await base44.entities.Lead.create({
+        business_id: BUSINESS_ID,
         name: formData.name,
         phone: formData.phone,
         email: formData.email,
@@ -95,12 +96,14 @@ export default function GetQuote() {
       });
 
       const savedQuote = await base44.entities.Quote.create({
+        business_id: BUSINESS_ID,
         lead_id: lead.id,
         ...quote,
       });
 
       if (assessment) {
         await base44.entities.AIAssessment.create({
+          business_id: BUSINESS_ID,
           lead_id: lead.id,
           fill_percent: assessment.estimated_trailer_fill_percent,
           volume_cubic_yards: assessment.estimated_volume_cubic_yards,
