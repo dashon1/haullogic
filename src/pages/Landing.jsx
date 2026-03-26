@@ -114,8 +114,13 @@ export default function Landing() {
         </div>
       </div>
 
-      <div className="py-6 text-center text-slate-400 text-xs">
-        © 2026 HaulLogic · Licensed & Insured
+      <div className="py-6 text-center text-slate-400 text-xs space-y-2">
+        <p>© 2026 HaulLogic · Licensed & Insured</p>
+        <p>
+          <Link to="/pricing" className="hover:text-orange-500 transition-colors">
+            🚛 Are you a hauling business? Use HaulLogic for your customers →
+          </Link>
+        </p>
       </div>
     </div>
   );

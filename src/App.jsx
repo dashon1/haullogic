@@ -12,6 +12,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import DriverView from './pages/DriverView';
 import Onboarding from './pages/Onboarding';
 import PublicQuote from './pages/PublicQuote';
+import Pricing from './pages/Pricing';
 
 class ErrorBoundary extends Component {
   state = { hasError: false };
@@ -59,6 +60,7 @@ const AuthenticatedApp = () => {
       <Route path="/DriverView" element={<DriverView />} />
       <Route path="/Onboarding" element={<Onboarding />} />
       <Route path="/quote/:businessId" element={<PublicQuote />} />
+      <Route path="/pricing" element={<Pricing />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
