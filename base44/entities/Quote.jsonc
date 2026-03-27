@@ -1,0 +1,68 @@
+{
+  "name": "Quote",
+  "type": "object",
+  "properties": {
+    "business_id": {
+      "type": "string",
+      "description": "Tenant identifier"
+    },
+    "lead_id": {
+      "type": "string"
+    },
+    "estimate_min": {
+      "type": "number"
+    },
+    "estimate_max": {
+      "type": "number"
+    },
+    "base_price": {
+      "type": "number"
+    },
+    "surcharges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "load_size_label": {
+      "type": "string"
+    },
+    "service_type_label": {
+      "type": "string"
+    },
+    "confidence_level": {
+      "type": "string",
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "admin_adjusted_min": {
+      "type": "number"
+    },
+    "admin_adjusted_max": {
+      "type": "number"
+    },
+    "admin_notes": {
+      "type": "string"
+    },
+    "pricing_version": {
+      "type": "string",
+      "default": "1.0"
+    }
+  },
+  "required": [
+    "lead_id",
+    "estimate_min",
+    "estimate_max"
+  ]
+}

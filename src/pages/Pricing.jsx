@@ -98,7 +98,7 @@ export default function Pricing() {
       }
     } catch (err) {
       console.error(err);
-      navigate('/AdminDashboard');
+      setError(err?.response?.data?.error || err?.message || 'Failed to start checkout. Please try again.');
     } finally {
       setLoadingPlan(null);
     }

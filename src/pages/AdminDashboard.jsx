@@ -3,7 +3,8 @@ import { base44 } from '@/api/base44Client';
 import LeadRow from '@/components/admin/LeadRow';
 import LeadDetail from '@/components/admin/LeadDetail';
 import PricingUpload from '@/components/admin/PricingUpload';
-import { Truck, Users, DollarSign, TrendingUp, RefreshCw, FileSpreadsheet, Copy, CheckCircle, Settings, Zap } from 'lucide-react';
+import { Truck, Users, DollarSign, TrendingUp, RefreshCw, FileSpreadsheet, Copy, CheckCircle, Settings, CreditCard, Zap } from 'lucide-react';
+import BillingTab from '@/components/admin/BillingTab';
 import { Button } from '@/components/ui/button';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -22,7 +23,8 @@ export default function AdminDashboard() {
   const location = useLocation();
   const upgraded = new URLSearchParams(location.search).get('upgraded') === '1';
 
-  const businessId = localStorage.getItem('haullogic_business_id') || '';
+  const [business, setBusiness] = useState(null);
+  const businessId = business?.business_id || '';
   const quoteUrl = businessId ? `${window.location.origin}/quote/${businessId}` : null;
 
   const copyLink = () => {
@@ -32,12 +34,14 @@ export default function AdminDashboard() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const loadData = async () => {
+  const loadData = async (biz) => {
+    const activeBiz = biz || business;
+    if (!activeBiz?.business_id) return;
     setLoading(true);
     const [l, q, a] = await Promise.all([
-      base44.entities.Lead.list('-created_date', 100),
-      base44.entities.Quote.list('-created_date', 100),
-      base44.entities.AIAssessment.list('-created_date', 100),
+      base44.entities.Lead.filter({ business_id: activeBiz.business_id }, '-created_date', 100),
+      base44.entities.Quote.filter({ business_id: activeBiz.business_id }, '-created_date', 100),
+      base44.entities.AIAssessment.filter({ business_id: activeBiz.business_id }, '-created_date', 100),
     ]);
     setLeads(l);
     setQuotes(q);
@@ -45,7 +49,18 @@ export default function AdminDashboard() {
     setLoading(false);
   };
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => {
+    base44.auth.me().then(user => {
+      base44.entities.Business.filter({ owner_email: user.email }).then(results => {
+        if (results.length > 0) {
+          setBusiness(results[0]);
+          loadData(results[0]);
+        } else {
+          setLoading(false);
+        }
+      });
+    });
+  }, []);
 
   const getQuote = (leadId) => quotes.find(q => q.lead_id === leadId);
   const getAssessment = (leadId) => assessments.find(a => a.lead_id === leadId);
@@ -82,6 +97,10 @@ export default function AdminDashboard() {
               <FileSpreadsheet className="w-3.5 h-3.5" />
               Pricing
             </Button>
+            <Button onClick={() => setActiveTab(activeTab === 'billing' ? 'leads' : 'billing')} variant="outline" size="sm" className={`gap-1.5 rounded-xl ${activeTab === 'billing' ? 'bg-orange-50 border-orange-300 text-orange-700' : ''}`}>
+              <CreditCard className="w-3.5 h-3.5" />
+              Billing
+            </Button>
             {!businessId && (
               <Link to="/Onboarding">
                 <Button size="sm" className="gap-1.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white">
@@ -96,7 +115,7 @@ export default function AdminDashboard() {
                 Upgrade
               </Button>
             </Link>
-            <Button onClick={loadData} variant="outline" size="sm" className="gap-1.5 rounded-xl">
+            <Button onClick={() => loadData()} variant="outline" size="sm" className="gap-1.5 rounded-xl">
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
@@ -153,6 +172,13 @@ export default function AdminDashboard() {
         {activeTab === 'pricing' && (
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-6">
             <PricingUpload onUploaded={() => setActiveTab('leads')} />
+          </div>
+        )}
+
+        {/* Billing Panel */}
+        {activeTab === 'billing' && (
+          <div className="mb-6">
+            <BillingTab business={business} />
           </div>
         )}
 

@@ -104,6 +104,7 @@ export default function PublicQuote() {
       const quote = calculateQuote(assessment, formData, pricingRules);
 
       const lead = await base44.entities.Lead.create({
+        business_id: businessId,
         name: formData.name,
         phone: formData.phone,
         email: formData.email,
@@ -118,10 +119,11 @@ export default function PublicQuote() {
         status: 'new',
       });
 
-      const savedQuote = await base44.entities.Quote.create({ lead_id: lead.id, ...quote });
+      const savedQuote = await base44.entities.Quote.create({ business_id: businessId, lead_id: lead.id, ...quote });
 
       if (assessment) {
         await base44.entities.AIAssessment.create({
+          business_id: businessId,
           lead_id: lead.id,
           fill_percent: assessment.estimated_trailer_fill_percent,
           volume_cubic_yards: assessment.estimated_volume_cubic_yards,

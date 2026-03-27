@@ -1,0 +1,75 @@
+{
+  "name": "AIAssessment",
+  "type": "object",
+  "properties": {
+    "business_id": {
+      "type": "string",
+      "description": "Tenant identifier"
+    },
+    "lead_id": {
+      "type": "string"
+    },
+    "fill_percent": {
+      "type": "number"
+    },
+    "volume_cubic_yards": {
+      "type": "number"
+    },
+    "weight_class": {
+      "type": "string"
+    },
+    "density_class": {
+      "type": "string"
+    },
+    "access_difficulty": {
+      "type": "string"
+    },
+    "heavy_material_flag": {
+      "type": "boolean"
+    },
+    "stairs_flag": {
+      "type": "boolean"
+    },
+    "confidence_score": {
+      "type": "number"
+    },
+    "review_required": {
+      "type": "boolean"
+    },
+    "service_recommendation": {
+      "type": "string"
+    },
+    "estimated_load_bucket": {
+      "type": "string"
+    },
+    "crew_recommendation": {
+      "type": "number"
+    },
+    "visible_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "count": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "material_categories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "raw_ai_response": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "lead_id"
+  ]
+}

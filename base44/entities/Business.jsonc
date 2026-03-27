@@ -1,0 +1,66 @@
+{
+  "name": "Business",
+  "type": "object",
+  "properties": {
+    "owner_email": {
+      "type": "string",
+      "description": "Email of the admin user who owns this business"
+    },
+    "business_id": {
+      "type": "string",
+      "description": "Unique slug identifier used in quote URLs"
+    },
+    "name": {
+      "type": "string",
+      "description": "Business display name"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "region": {
+      "type": "string"
+    },
+    "plan": {
+      "type": "string",
+      "enum": [
+        "starter",
+        "pro",
+        "scale"
+      ],
+      "default": "starter"
+    },
+    "stripe_customer_id": {
+      "type": "string"
+    },
+    "stripe_subscription_id": {
+      "type": "string"
+    },
+    "subscription_status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "trialing",
+        "past_due",
+        "canceled",
+        "none"
+      ],
+      "default": "none"
+    },
+    "quote_count_this_month": {
+      "type": "number",
+      "default": 0
+    },
+    "quote_count_reset_date": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "owner_email",
+    "business_id",
+    "name"
+  ]
+}
