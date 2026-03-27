@@ -43,18 +43,41 @@ Deno.serve(async (req) => {
       }
     }
 
-    if (event.type === 'customer.subscription.deleted' || event.type === 'customer.subscription.updated') {
+    if (event.type === 'customer.subscription.updated' || event.type === 'customer.subscription.deleted') {
       const sub = session;
       const customer = await stripe.customers.retrieve(sub.customer);
       const ownerEmail = customer.metadata?.owner_email || customer.email;
 
       const businesses = await base44.asServiceRole.entities.Business.filter({ owner_email: ownerEmail });
       if (businesses.length > 0) {
-        const status = sub.status === 'active' ? 'active' : sub.status === 'past_due' ? 'past_due' : 'canceled';
-        const plan = status === 'canceled' ? 'starter' : businesses[0].plan;
+        const statusMap = { active: 'active', trialing: 'trialing', past_due: 'past_due', canceled: 'canceled' };
+        const subStatus = statusMap[sub.status] || 'canceled';
+
+        // Resolve plan from current price ID on the subscription
+        const priceId = sub.items?.data?.[0]?.price?.id;
+        let plan = PLAN_FROM_PRICE[priceId] || businesses[0].plan;
+        if (subStatus === 'canceled' || event.type === 'customer.subscription.deleted') {
+          plan = 'starter';
+        }
+
         await base44.asServiceRole.entities.Business.update(businesses[0].id, {
-          subscription_status: status,
+          subscription_status: subStatus,
           plan,
+          stripe_subscription_id: sub.id,
+          stripe_customer_id: sub.customer,
+        });
+      }
+    }
+
+    // Handle invoice payment failures
+    if (event.type === 'invoice.payment_failed') {
+      const invoice = session;
+      const customer = await stripe.customers.retrieve(invoice.customer);
+      const ownerEmail = customer.metadata?.owner_email || customer.email;
+      const businesses = await base44.asServiceRole.entities.Business.filter({ owner_email: ownerEmail });
+      if (businesses.length > 0) {
+        await base44.asServiceRole.entities.Business.update(businesses[0].id, {
+          subscription_status: 'past_due',
         });
       }
     }

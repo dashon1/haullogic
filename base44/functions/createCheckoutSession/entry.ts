@@ -1,6 +1,8 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.23';
 import Stripe from 'npm:stripe@14.21.0';
 
+const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
+
 const PRICE_MAP = {
   pro_monthly: Deno.env.get('STRIPE_PRO_PRICE_ID'),
   scale_monthly: Deno.env.get('STRIPE_SCALE_PRICE_ID'),
@@ -10,7 +12,6 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
-
     if (!user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -22,30 +23,29 @@ Deno.serve(async (req) => {
       return Response.json({ error: `Unknown price_key: ${price_key}` }, { status: 400 });
     }
 
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
-
-    // Look up or create Stripe customer
-    let customerId;
+    // Look up existing business to reuse Stripe customer if available
     const businesses = await base44.asServiceRole.entities.Business.filter({ owner_email: user.email });
-    if (businesses.length > 0 && businesses[0].stripe_customer_id) {
-      customerId = businesses[0].stripe_customer_id;
-    } else {
-      const customer = await stripe.customers.create({
-        email: user.email,
-        name: user.full_name,
-        metadata: { owner_email: user.email },
-      });
-      customerId = customer.id;
-    }
+    const business = businesses[0];
+    const existingCustomerId = business?.stripe_customer_id;
 
-    const session = await stripe.checkout.sessions.create({
-      customer: customerId,
+    const sessionParams = {
       mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: success_url + '?session_id={CHECKOUT_SESSION_ID}',
-      cancel_url: cancel_url,
+      success_url: success_url || `${req.headers.get('origin')}/Onboarding`,
+      cancel_url: cancel_url || `${req.headers.get('origin')}/pricing`,
       metadata: { owner_email: user.email },
-    });
+      subscription_data: {
+        metadata: { owner_email: user.email },
+      },
+    };
+
+    if (existingCustomerId) {
+      sessionParams.customer = existingCustomerId;
+    } else {
+      sessionParams.customer_email = user.email;
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     return Response.json({ url: session.url });
   } catch (error) {

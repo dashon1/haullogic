@@ -3,7 +3,8 @@ import { base44 } from '@/api/base44Client';
 import LeadRow from '@/components/admin/LeadRow';
 import LeadDetail from '@/components/admin/LeadDetail';
 import PricingUpload from '@/components/admin/PricingUpload';
-import { Truck, Users, DollarSign, TrendingUp, RefreshCw, FileSpreadsheet, Copy, CheckCircle, Settings } from 'lucide-react';
+import { Truck, Users, DollarSign, TrendingUp, RefreshCw, FileSpreadsheet, Copy, CheckCircle, Settings, CreditCard } from 'lucide-react';
+import BillingTab from '@/components/admin/BillingTab';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 
@@ -93,6 +94,10 @@ export default function AdminDashboard() {
               <FileSpreadsheet className="w-3.5 h-3.5" />
               Pricing
             </Button>
+            <Button onClick={() => setActiveTab(activeTab === 'billing' ? 'leads' : 'billing')} variant="outline" size="sm" className={`gap-1.5 rounded-xl ${activeTab === 'billing' ? 'bg-orange-50 border-orange-300 text-orange-700' : ''}`}>
+              <CreditCard className="w-3.5 h-3.5" />
+              Billing
+            </Button>
             {!businessId && (
               <Link to="/Onboarding">
                 <Button size="sm" className="gap-1.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white">
@@ -150,6 +155,13 @@ export default function AdminDashboard() {
         {activeTab === 'pricing' && (
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-6">
             <PricingUpload onUploaded={() => setActiveTab('leads')} />
+          </div>
+        )}
+
+        {/* Billing Panel */}
+        {activeTab === 'billing' && (
+          <div className="mb-6">
+            <BillingTab business={business} />
           </div>
         )}
 
