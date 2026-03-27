@@ -2,8 +2,8 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.23';
 import Stripe from 'npm:stripe@14.21.0';
 
 const PRICE_MAP = {
-  pro_monthly: Deno.env.get('STRIPE_PRICE_PRO_MONTHLY'),
-  scale_monthly: Deno.env.get('STRIPE_PRICE_SCALE_MONTHLY'),
+  pro_monthly: Deno.env.get('STRIPE_PRO_PRICE_ID'),
+  scale_monthly: Deno.env.get('STRIPE_SCALE_PRICE_ID'),
 };
 
 Deno.serve(async (req) => {
