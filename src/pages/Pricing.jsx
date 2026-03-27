@@ -114,7 +114,7 @@ export default function Pricing() {
           </div>
           <span className="text-white font-black text-lg">HaulLogic</span>
         </Link>
-        <Link to="/Onboarding" className="text-slate-400 hover:text-white text-sm transition-colors">
+        <Link to="/AdminDashboard" className="text-slate-400 hover:text-white text-sm transition-colors">
           Already signed up? →
         </Link>
       </div>
