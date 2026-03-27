@@ -114,13 +114,24 @@ export default function Landing() {
         </div>
       </div>
 
-      <div className="py-6 text-center text-slate-400 text-xs space-y-2">
-        <p>© 2026 HaulLogic · Licensed & Insured</p>
-        <p>
-          <Link to="/pricing" className="hover:text-orange-500 transition-colors">
-            🚛 Are you a hauling business? Use HaulLogic for your customers →
+      {/* Business Owner CTA */}
+      <div className="bg-slate-900 py-8">
+        <div className="max-w-lg mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <p className="text-white font-bold text-sm">Own a hauling business?</p>
+            <p className="text-slate-400 text-xs mt-0.5">Give your customers instant AI-powered quotes with HaulLogic.</p>
+          </div>
+          <Link to="/pricing" className="shrink-0">
+            <Button className="bg-orange-500 hover:bg-orange-400 text-white rounded-xl gap-2 text-sm font-bold">
+              <Truck className="w-4 h-4" />
+              Start Free
+            </Button>
           </Link>
-        </p>
+        </div>
+      </div>
+
+      <div className="py-4 text-center text-slate-400 text-xs">
+        <p>© 2026 HaulLogic · Licensed & Insured</p>
       </div>
     </div>
   );

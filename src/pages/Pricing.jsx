@@ -78,8 +78,8 @@ export default function Pricing() {
 
   const handlePlanSelect = async (plan) => {
     if (!plan.priceKey) {
-      // Free plan — go straight to onboarding
-      navigate('/Onboarding');
+      // Free plan — go to dashboard (onboarding already complete)
+      navigate('/AdminDashboard');
       return;
     }
 
@@ -88,7 +88,7 @@ export default function Pricing() {
     try {
       const res = await base44.functions.invoke('createCheckoutSession', {
         price_key: plan.priceKey,
-        success_url: `${window.location.origin}/Onboarding`,
+        success_url: `${window.location.origin}/AdminDashboard?upgraded=1`,
         cancel_url: `${window.location.origin}/pricing`,
       });
       if (res.data?.url) {
@@ -98,8 +98,7 @@ export default function Pricing() {
       }
     } catch (err) {
       console.error(err);
-      // Stripe not configured yet — go to onboarding and they can upgrade later
-      navigate('/Onboarding');
+      navigate('/AdminDashboard');
     } finally {
       setLoadingPlan(null);
     }

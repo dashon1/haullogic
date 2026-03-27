@@ -253,8 +253,8 @@ export default function Onboarding() {
                   {copied ? <><CheckCircle className="w-3 h-3 text-green-500" /> Copied!</> : <><Copy className="w-3 h-3" /> Copy Link</>}
                 </Button>
               </div>
-              <Button onClick={() => navigate('/AdminDashboard')} className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-2xl h-12 font-semibold">
-                Go to Dashboard
+              <Button onClick={() => navigate('/pricing')} className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-2xl h-12 font-semibold">
+                Choose Your Plan →
               </Button>
             </div>
           )}

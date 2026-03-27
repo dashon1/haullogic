@@ -3,9 +3,9 @@ import { base44 } from '@/api/base44Client';
 import LeadRow from '@/components/admin/LeadRow';
 import LeadDetail from '@/components/admin/LeadDetail';
 import PricingUpload from '@/components/admin/PricingUpload';
-import { Truck, Users, DollarSign, TrendingUp, RefreshCw, FileSpreadsheet, Copy, CheckCircle, Settings } from 'lucide-react';
+import { Truck, Users, DollarSign, TrendingUp, RefreshCw, FileSpreadsheet, Copy, CheckCircle, Settings, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const filterTabs = ['All', 'New', 'Reviewed', 'Approved', 'Booked', 'Completed'];
 
@@ -18,6 +18,9 @@ export default function AdminDashboard() {
   const [selectedLead, setSelectedLead] = useState(null);
   const [activeTab, setActiveTab] = useState('leads');
   const [copied, setCopied] = useState(false);
+
+  const location = useLocation();
+  const upgraded = new URLSearchParams(location.search).get('upgraded') === '1';
 
   const businessId = localStorage.getItem('haullogic_business_id') || '';
   const quoteUrl = businessId ? `${window.location.origin}/quote/${businessId}` : null;
@@ -87,12 +90,26 @@ export default function AdminDashboard() {
                 </Button>
               </Link>
             )}
+            <Link to="/pricing">
+              <Button size="sm" variant="outline" className="gap-1.5 rounded-xl border-orange-300 text-orange-600 hover:bg-orange-50">
+                <Zap className="w-3.5 h-3.5" />
+                Upgrade
+              </Button>
+            </Link>
             <Button onClick={loadData} variant="outline" size="sm" className="gap-1.5 rounded-xl">
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
           </div>
         </div>
+
+        {/* Payment success banner */}
+        {upgraded && (
+          <div className="bg-green-50 border border-green-200 rounded-2xl p-4 mb-4 flex items-center gap-3">
+            <CheckCircle className="w-5 h-5 text-green-500 shrink-0" />
+            <p className="text-green-800 text-sm font-semibold">Payment successful! Your plan has been upgraded.</p>
+          </div>
+        )}
 
         {/* Quote link banner */}
         {quoteUrl && (
