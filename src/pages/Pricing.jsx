@@ -98,8 +98,7 @@ export default function Pricing() {
       }
     } catch (err) {
       console.error(err);
-      // Stripe not configured yet — go to onboarding and they can upgrade later
-      navigate('/Onboarding');
+      setError(err?.response?.data?.error || err?.message || 'Failed to start checkout. Please try again.');
     } finally {
       setLoadingPlan(null);
     }
