@@ -165,10 +165,22 @@ const integrations = {
 };
 
 // ---- backend functions (Stripe checkout, tickets, emails) — stubbed ----
+const FUNCTIONS_URL = import.meta.env.VITE_FUNCTIONS_URL || 'https://fn.aimicrotechlink.cloud';
 const functions = {
-  async invoke(name, payload) {
-    console.warn(`[shim] functions.invoke('${name}') not wired to a backend yet`, payload);
-    return { data: {}, status: 'not_wired' };
+  async invoke(name, payload = {}) {
+    try {
+      const res = await fetch(`${FUNCTIONS_URL}/fn/${name}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ app: APP, ...payload }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) console.warn(`[fn ${name}]`, data.error);
+      return data;
+    } catch (e) {
+      console.warn(`[fn ${name}] failed`, e.message);
+      return { data: {} };
+    }
   },
 };
 
