@@ -1,0 +1,92 @@
+{
+  "name": "PricingRule",
+  "type": "object",
+  "properties": {
+    "BusinessId": {
+      "type": "string",
+      "description": "Unique identifier for the business owning this pricing rule."
+    },
+    "Region": {
+      "type": "string",
+      "description": "Geographical region this pricing rule applies to (optional)."
+    },
+    "ServiceType": {
+      "type": "string",
+      "enum": [
+        "FullService",
+        "Curbside",
+        "DropOff"
+      ],
+      "description": "Type of service."
+    },
+    "TierCode": {
+      "type": "string",
+      "description": "Code for the pricing tier (e.g., MIN, QTR, HALF, 3QTR, FULL, HALF_DAY, FULL_DAY, WEEKEND, WEEKLY, CUSTOM)."
+    },
+    "TierLabel": {
+      "type": "string",
+      "description": "Human-friendly label for the pricing tier."
+    },
+    "TierOrder": {
+      "type": "integer",
+      "description": "Order for displaying tiers in the UI."
+    },
+    "LineType": {
+      "type": "string",
+      "enum": [
+        "BASE",
+        "ADDON",
+        "DISCOUNT",
+        "RULE"
+      ],
+      "description": "Type of pricing line."
+    },
+    "ItemOrCondition": {
+      "type": "string",
+      "description": "Specific item or condition this rule applies to."
+    },
+    "AmountMin": {
+      "type": "number",
+      "description": "Minimum amount for this pricing rule."
+    },
+    "AmountMax": {
+      "type": "number",
+      "description": "Maximum amount for this pricing rule."
+    },
+    "Unit": {
+      "type": "string",
+      "enum": [
+        "flat",
+        "per_item",
+        "per_flight",
+        "per_250lb",
+        "per_hour",
+        "per_mile",
+        "per_day"
+      ],
+      "description": "Unit for the amount."
+    },
+    "Trigger": {
+      "type": "string",
+      "description": "Condition that triggers this rule (e.g., curbside_ready, stairs, heavy_material, same_day)."
+    },
+    "DisposalCredit": {
+      "type": "number",
+      "description": "Disposal credit amount (optional, for Trailer Drop-Off)."
+    },
+    "Notes": {
+      "type": "string",
+      "description": "Additional notes about the pricing rule."
+    }
+  },
+  "required": [
+    "BusinessId",
+    "ServiceType",
+    "TierCode",
+    "LineType",
+    "ItemOrCondition",
+    "AmountMin",
+    "AmountMax",
+    "Unit"
+  ]
+}
