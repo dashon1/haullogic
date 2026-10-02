@@ -115,10 +115,36 @@ const auth = {
   async me() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Not authenticated');
-    return { id: user.id, email: user.email, role: user.role, ...(user.user_metadata || {}) };
+    const meta = user.user_metadata || {};
+    const mine = (meta.entitlements && meta.entitlements[APP]) || {};
+    return {
+      id: user.id, email: user.email, role: user.role, ...meta,
+      ...(mine.plan !== undefined ? { plan: mine.plan, subscription_plan: mine.plan } : {}),
+      ...(mine.status !== undefined ? { subscription_status: mine.status } : {}),
+      ...(mine.credits !== undefined ? { credits: mine.credits } : {}),
+      ...(mine.credits_expire_at !== undefined ? { credits_expire_at: mine.credits_expire_at } : {}),
+      ...(mine.role !== undefined ? { role: mine.role } : {}),
+    };
   },
   async updateMe(obj = {}) {
-    const { data, error } = await supabase.auth.updateUser({ data: obj });
+    const NS_KEYS = ['credits', 'subscription_plan', 'plan', 'subscription_status', 'credits_expire_at', 'role'];
+    const hasNs = NS_KEYS.some((k) => Object.prototype.hasOwnProperty.call(obj, k));
+    let payload = obj;
+    if (hasNs) {
+      const { data: { user: cur } } = await supabase.auth.getUser();
+      const meta = (cur && cur.user_metadata) || {};
+      const entry = { ...((meta.entitlements && meta.entitlements[APP]) || {}) };
+      const rest = { ...obj };
+      for (const k of NS_KEYS) {
+        if (Object.prototype.hasOwnProperty.call(obj, k)) {
+          const ek = k === 'subscription_plan' ? 'plan' : (k === 'subscription_status' ? 'status' : k);
+          entry[ek] = obj[k];
+          delete rest[k];
+        }
+      }
+      payload = { ...rest, entitlements: { ...(meta.entitlements || {}), [APP]: entry } };
+    }
+    const { data, error } = await supabase.auth.updateUser({ data: payload });
     if (error) throw error;
     return data.user;
   },
